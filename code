@@ -1,0 +1,83 @@
+import os
+import tkinter as tk
+import customtkinter as ctk
+from tkinter import filedialog
+import pygame
+
+# Inicializa o Pygame para tocar músicas
+pygame.mixer.init()
+
+# Configuração da Janela
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+janela = ctk.CTk()
+janela.title("Spotify Clone")
+janela.geometry("400x500")
+
+# Lista de reprodução
+playlist = []
+musica_atual = 0
+
+def adicionar_musicas():
+    arquivos = filedialog.askopenfilenames(filetypes=[("Arquivos MP3", "*.mp3")])
+    for arquivo in arquivos:
+        playlist.append(arquivo)
+        lista_musicas.insert(tk.END, os.path.basename(arquivo))
+
+def tocar_musica():
+    global musica_atual
+    if playlist:
+        pygame.mixer.music.load(playlist[musica_atual])
+        pygame.mixer.music.play()
+        label_musica.configure(text=os.path.basename(playlist[musica_atual]))
+
+def pausar_musica():
+    pygame.mixer.music.pause()
+
+def continuar_musica():
+    pygame.mixer.music.unpause()
+
+def proxima_musica():
+    global musica_atual
+    if playlist:
+        musica_atual = (musica_atual + 1) % len(playlist)
+        tocar_musica()
+
+def voltar_musica():
+    global musica_atual
+    if playlist:
+        musica_atual = (musica_atual - 1) % len(playlist)
+        tocar_musica()
+
+# Interface
+frame = ctk.CTkFrame(janela)
+frame.pack(pady=20, padx=20, fill="both", expand=True)
+
+label_musica = ctk.CTkLabel(frame, text="Nenhuma música selecionada", font=("Arial", 14))
+label_musica.pack(pady=10)
+
+lista_musicas = tk.Listbox(frame, bg="#1e1e1e", fg="white", selectbackground="#00aaff")
+lista_musicas.pack(pady=10, fill="both", expand=True)
+
+botoes_frame = ctk.CTkFrame(janela)
+botoes_frame.pack(pady=10)
+
+btn_adicionar = ctk.CTkButton(botoes_frame, text="Adicionar Músicas", command=adicionar_musicas)
+btn_adicionar.pack(side=tk.LEFT, padx=5)
+
+btn_play = ctk.CTkButton(botoes_frame, text="▶️ Play", command=tocar_musica)
+btn_play.pack(side=tk.LEFT, padx=5)
+
+btn_pause = ctk.CTkButton(botoes_frame, text="⏸️ Pause", command=pausar_musica)
+btn_pause.pack(side=tk.LEFT, padx=5)
+
+btn_continuar = ctk.CTkButton(botoes_frame, text="▶️ Continuar", command=continuar_musica)
+btn_continuar.pack(side=tk.LEFT, padx=5)
+
+btn_proxima = ctk.CTkButton(janela, text="⏭️ Próxima", command=proxima_musica)
+btn_proxima.pack(pady=5)
+
+btn_voltar = ctk.CTkButton(janela, text="⏮️ Voltar", command=voltar_musica)
+btn_voltar.pack(pady=5)
+
+janela.mainloop()
